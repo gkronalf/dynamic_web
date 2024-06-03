@@ -1,0 +1,86 @@
+---
+# tasks file for nodejs
+
+- name: "Install nodejs"
+  tags: "nodejs"
+  ansible.builtin.apt:
+    name:
+    - nodejs
+    state: present
+    update_cache: true
+
+- name: "Install npm"
+  tags: "nodejs"
+  ansible.builtin.package:
+    name: npm
+
+- name: "Creates directory project"
+  tags: "nodejs"
+  ansible.builtin.file:
+    path: /home/vagrant/nginx_server_project
+    state: directory
+    mode: '0755'
+
+- name: "Copy config files"
+  tags: "nodejs"
+  ansible.builtin.template:
+    src: templates/nodejs/webserver.j2
+    dest: /home/vagrant/nginx_server_project/webserver.js
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+- name: "Init npm"
+  tags: "nodejs"
+  ansible.builtin.shell: 'cd /home/vagrant/nginx_server_project && npm init -y'
+  args:
+    executable: /bin/bash
+  register: outputcode
+  changed_when: outputcode.rc != 0
+
+- name: "Create service file"
+  tags: "nodejs"
+  template:
+    src: templates/nodejs/service
+    dest: /etc/systemd/system/nodejs.service
+  register: service_conf
+
+- name: "Reload systemd daemon"
+  tags: "nodejs"
+  systemd:
+    daemon_reload: yes
+  when: service_conf.changed
+
+- name: "Start NodeJS service"
+  tags: "nodejs"
+  service:
+    name: nodejs
+    state: started
+    enabled: yes
+
+# - name: "Copy script for start server"
+#   tags: "nodejs"
+#   ansible.builtin.copy:
+#     src: templates/nodejs/start_server.sh
+#     dest: /home/vagrant/nginx_server_project/start_server.sh
+#     owner: vagrant
+#     group: vagrant
+#     mode: '0755'
+#     follow: yes
+
+  # - name: "Start server"
+  #   tags: "nodejs"
+  #   # async: 360
+  #   ansible.builtin.shell: 'cd /home/vagrant/nginx_server_project && ./start_server.sh'
+  #   args:
+  #     executable: /bin/bash
+  #   register: start_server
+  #   changed_when: start_server.rc != 0
+
+  # - name: "Install packages based on package.json."
+  #   community.general.npm:
+  #     path: /home/vagrant/nginx_server_project/
+
+  # - name: restart all hosts
+  #   reboot:
+  #     reboot_timeout: 120

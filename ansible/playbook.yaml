@@ -1,0 +1,22 @@
+---
+
+- name: "Install tools"
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Set timezone Moscow
+      community.general.timezone:
+        name: Europe/Moscow
+
+- name: "Install webserver"
+  hosts: frontServers
+  become: true
+  roles:
+  - nginx_install
+
+- name: "Install backEnd"
+  hosts: backEndServers
+  become: true
+  roles:
+  - nodejs

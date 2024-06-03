@@ -1,0 +1,46 @@
+---
+# tasks file for nginx_install
+
+- name: "Install nginx"
+  tags: "nginx"
+  ansible.builtin.apt:
+    name:
+    - nginx
+    state: present
+    update_cache: true
+
+- name: "Ensure nginx is enabled"
+  tags: "nginx"
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: yes
+
+- name: "Disabled default config"
+  ansible.builtin.file:
+   path: "/etc/nginx/sites-enabled/default"
+   state: absent
+
+- name: "Copy config files"
+  tags: "nginx"
+  ansible.builtin.copy:
+    src: templates/nginx/webserver.config
+    dest: /etc/nginx/sites-available/webserver.config
+    owner: root
+    group: root
+    mode: '0644'
+    follow: yes
+
+- name: "Enabled config nginx"
+  tags: "nginx"
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/webserver.config
+    dest: /etc/nginx/sites-enabled/webserver.config
+    owner: root
+    group: root
+    state: link
+
+- name: "Restart nginx"
+  tags: "nginx"
+  ansible.builtin.service:
+    name: nginx
+    state: restarted

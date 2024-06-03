@@ -1,0 +1,14 @@
+[Unit]
+Description=nodejs server
+
+[Service]
+ExecStart=/usr/bin/node /home/vagrant/nginx_server_project/webserver.js
+Restart=on-failure
+# Output to syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nodejs-example
+Environment=NODE_ENV=production PORT=3000
+
+[Install]
+WantedBy=multi-user.target

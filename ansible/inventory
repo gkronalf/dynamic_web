@@ -1,0 +1,6 @@
+[frontServers]
+frontEnd ansible_host=192.168.50.10 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/frontEnd/virtualbox/private_key 
+
+[backEndServers]
+backEnd01 ansible_host=192.168.50.11 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/backEnd01/virtualbox/private_key 
+backEnd02 ansible_host=192.168.50.12 ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/backEnd02/virtualbox/private_key 
